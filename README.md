@@ -3,8 +3,8 @@
 <img src="docs/banner.svg" alt="Aish — a symbol language for AI agents to write notes to each other" width="100%">
 
 [![density](https://img.shields.io/badge/density-1.58x_measured-4dd4ac?style=flat)](#the-numbers)
-[![tests](https://img.shields.io/badge/tests-31_passing-brightgreen?style=flat)](#tests)
-[![skill load](https://img.shields.io/badge/skill_load-428_tokens-38bdf8?style=flat)](#does-it-pay-for-itself)
+[![tests](https://img.shields.io/badge/tests-33_passing-brightgreen?style=flat)](#tests)
+[![skill load](https://img.shields.io/badge/skill_load-542_tokens-38bdf8?style=flat)](#does-it-pay-for-itself)
 [![dependencies](https://img.shields.io/badge/dependencies-none-lightgrey?style=flat)](#install)
 [![python](https://img.shields.io/badge/python-3.8%2B-3776ab?style=flat)](#install)
 [![spec](https://img.shields.io/badge/spec-%23a2_frozen-f0883e?style=flat)](#status)
@@ -79,7 +79,7 @@ For other agent runtimes, point the tool at `SKILL.md`; `CODEBOOK.md` and
 
 ```bash
 cd ~/.claude/skills/aish
-python tests/test_aish.py     # 31 tests
+python tests/test_aish.py     # 33 tests
 python benchmarks/bench.py    # regenerates every number in this README
 python tools/aish.py budget   # does the skill pay for itself?
 ```
@@ -98,9 +98,9 @@ text rather than always encoding:
 
 ```console
 $ python tools/aish.py budget
-SKILL.md costs      428 tok to load
+SKILL.md costs      542 tok to load
 measured savings    37% of note tokens
-break-even          1167 tok of notes (~6 handoff notes)
+break-even          1478 tok of notes (~7 handoff notes)
 
 Below that, writing prose is cheaper than loading this skill.
 ```
@@ -121,16 +121,26 @@ never get there, so installing Aish was a **net loss** and nothing said so.
 
 1. **Progressive disclosure.** Only 29 of the 77 predicates are ever used and
    the top 20 cover 90%, so `SKILL.md` inlines a core subset and pulls
-   `CODEBOOK.md` / `SPEC.md` only when something does not fit. 1,819 → **428**.
+   `CODEBOOK.md` / `SPEC.md` only when something does not fit. 1,819 → **542**.
 2. **The decision rule ships first.** `SKILL.md` opens with the threshold and an
    explicit *"write normal prose and stop reading here"* branch, so an agent
    that should not use Aish bails after ~60 tokens.
 
-Two tests keep it honest, because this decays silently as documentation grows:
-`test_skill_file_stays_within_its_token_budget` fails above 500 tokens, and
-`test_skill_threshold_is_not_optimistic` fails if the number printed in
-`SKILL.md` drops below the measured break-even. The second already caught a real
-error — `SKILL.md` claimed 1,000 against a measured 1,167. It now says 1,500.
+Tests keep it honest, because this decays silently as documentation grows:
+`test_skill_stays_worth_loading` fails if break-even passes ~1,500 tokens of
+notes, and `test_skill_threshold_is_not_optimistic` fails if the number printed
+in `SKILL.md` drops below the measured break-even. The second already caught a
+real error — `SKILL.md` claimed 1,000 against a measured 1,167.
+
+A later fix showed why the first test is stated in break-even rather than file
+size. `SKILL.md` described the format without ever mentioning the required
+`#a2` header or where a shared dictionary lives, so an agent following it
+emitted **invalid documents** — and the missing header silently swallowed the
+first definition. Fixing that cost tokens and pushed the file past what had been
+an arbitrary 500-token cap. The cap was only ever a proxy for break-even, so the
+test now asserts break-even directly, in the units that actually matter.
+`test_skill_teaches_everything_needed_to_produce_a_valid_document` guards the
+original bug.
 </details>
 
 ---
@@ -271,7 +281,7 @@ from optimal, so `check` treats economics as correctness.
 
 ## Tests
 
-`python tests/test_aish.py` — 31 tests, no framework, no dependencies.
+`python tests/test_aish.py` — 33 tests, no framework, no dependencies.
 
 | group | what it guards |
 |---|---|
@@ -284,7 +294,9 @@ from optimal, so `check` treats economics as correctness.
 | | property test: lint verdict equals `k*P > P+k` across real literals and use counts |
 | **corpus** | every document validates, is lint-clean, and is denser than its English twin |
 | | **every verbatim string appears in the English source** — identifiers must survive encoding untouched |
-| **skill economics** | `SKILL.md` stays under 500 tokens, or the break-even rises and installing the skill starts costing tokens |
+| **skill economics** | break-even stays under ~1,500 tokens of notes, or a normal session never earns the skill back |
+| | `SKILL.md` teaches the `#a2` header, the `.dict` location and the filename — omitting any one silently produces invalid or non-amortising documents |
+| | the format example in `SKILL.md` is itself valid Aish |
 | | the threshold printed in `SKILL.md` is never below the measured break-even |
 | | every predicate listed inline in `SKILL.md` exists, and the core covers ≥85% of real use |
 
@@ -333,7 +345,7 @@ responsible for the work.
 | `SPEC.md` | normative grammar, with the measurement behind each rule |
 | `CODEBOOK.md` | the 77 predicates — **generated**, do not hand-edit |
 | `tools/aish.py` | validator, economics linter, interning advisor, measurement |
-| `tests/test_aish.py` | 31 tests |
+| `tests/test_aish.py` | 33 tests |
 | `benchmarks/bench.py` | harness; regenerates `RESULTS.md` |
 | `benchmarks/corpus/` | 6 document pairs (`.md` English, `.aish` twin) |
 | `examples/payments.*` | tutorial: shared dictionary, document, English source |

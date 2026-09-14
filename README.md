@@ -47,7 +47,7 @@ thing — no operators, no punctuation, no grammar words.
 ## Quickstart
 
 ```bash
-git clone https://github.com/flamacore/Aish ~/.claude/skills/aish
+git clone https://github.com/Circuit-Biscuit/Aish ~/.claude/skills/aish
 cd ~/.claude/skills/aish
 python tests/test_aish.py          # 31 tests
 python benchmarks/bench.py         # reproduce every number below

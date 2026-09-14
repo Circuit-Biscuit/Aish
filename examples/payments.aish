@@ -1,0 +1,26 @@
+#a2 payments reliability investigation
+def aa retry wrapper 3 att 200ms
+neg aa has af
+neg ad idem
+pay aa
+did obs ai aa stag
+why cha timeout att2
+use ab aa
+bug ab dup refund
+why nev obs ab som low volume
+doc ad has af
+doc ae has af
+def ac compare day total
+neg ac obs ai
+key ac blind same day
+try add af aa
+rev why aa nev has ag
+fix cal pass ag aa
+req fix mod sig aa upd ab
+req fix own ah
+ask ai prod
+conf 4
+why rel ver 42 mos 3
+next test ac pair amount customer 60s
+key err "charge_declined_retryable" nev mod
+why mobile eq

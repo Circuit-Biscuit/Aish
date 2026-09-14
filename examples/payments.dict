@@ -1,0 +1,11 @@
+// shared project dictionary. loaded once, reused by every document.
+// cost is paid one time; each use afterwards is 1 token.
+aa packages/payments/src/charge/retryWrapper.ts
+ab packages/payments/src/refund/refundClient.ts
+ac packages/payments/src/ledger/reconcile.ts
+ad vendor charge endpoint
+ae vendor refund endpoint
+af Idempotency-Key header
+ag stable operation key
+ah platform team
+ai duplicate charge

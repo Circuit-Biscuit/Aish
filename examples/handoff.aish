@@ -1,0 +1,11 @@
+#a1 handoff auth refresh bug, checkout service
+@ src/auth/session.py:140
+1| ! refresh runs before clock skew check
+  . client clock >30s ahead -> refresh sends expired token
+  . gateway -> 401 -> retry -> refresh -> loop
++ reproduced local w/ clock forward, every run, not flaky
+- retry limit 3 -> masks only, user still logged out, reverted
+~ fix = move skew check above refresh [1] %70
+ ? offline-mode path calls same function, unverified, check before merge
+* gateway error string "token_expired_at_issue" verbatim, mobile matches on it
+? staging gateway skew tolerance = production?

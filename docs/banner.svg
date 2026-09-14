@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 320" width="1200" height="320" role="img" aria-label="Aish - a symbol language for AI agents to write notes to each other">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0d1117"/>
+      <stop offset="55%" stop-color="#131a26"/>
+      <stop offset="100%" stop-color="#0b1a1f"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#4dd4ac"/>
+      <stop offset="100%" stop-color="#38bdf8"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1200" height="320" rx="14" fill="url(#bg)"/>
+  <rect x="0" y="0" width="1200" height="3" rx="1.5" fill="url(#accent)"/>
+
+  <!-- wordmark -->
+  <text x="64" y="118" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace"
+        font-size="76" font-weight="700" fill="#e6edf3" letter-spacing="-1">Aish</text>
+  <text x="268" y="118" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace"
+        font-size="26" fill="#4dd4ac">#a2</text>
+
+  <text x="66" y="158" font-family="-apple-system,Segoe UI,Helvetica,Arial,sans-serif"
+        font-size="23" fill="#8b98a5">A symbol language for AI agents to write notes to each other.</text>
+  <text x="66" y="190" font-family="-apple-system,Segoe UI,Helvetica,Arial,sans-serif"
+        font-size="19" fill="#5d6b7a">Not shorthand. Not a cipher. Not meant for humans.</text>
+
+  <!-- before / after panel -->
+  <g transform="translate(64,216)">
+    <rect x="0" y="0" width="470" height="70" rx="8" fill="#161b22" stroke="#232c38"/>
+    <text x="16" y="26" font-family="-apple-system,Segoe UI,Helvetica,Arial,sans-serif"
+          font-size="12" fill="#6e7d8d" letter-spacing="1.2">ENGLISH</text>
+    <text x="16" y="52" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace"
+          font-size="17" fill="#8b98a5">The login form submits twice when...</text>
+    <text x="418" y="26" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace"
+          font-size="17" font-weight="700" fill="#f0883e">80</text>
+
+    <text x="500" y="45" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace"
+          font-size="26" fill="#4dd4ac">-&gt;</text>
+
+    <rect x="548" y="0" width="470" height="70" rx="8" fill="#161b22" stroke="#2c3a33"/>
+    <text x="564" y="26" font-family="-apple-system,Segoe UI,Helvetica,Arial,sans-serif"
+          font-size="12" fill="#6e7d8d" letter-spacing="1.2">AISH</text>
+    <text x="564" y="52" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace"
+          font-size="17" fill="#4dd4ac">bug submit handler dup fire</text>
+    <text x="966" y="26" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace"
+          font-size="17" font-weight="700" fill="#4dd4ac">47</text>
+  </g>
+
+  <!-- stat rail -->
+  <g font-family="-apple-system,Segoe UI,Helvetica,Arial,sans-serif">
+    <text x="1136" y="96" text-anchor="end" font-size="46" font-weight="700" fill="#e6edf3">1.58x</text>
+    <text x="1136" y="120" text-anchor="end" font-size="13" fill="#6e7d8d" letter-spacing="1">MEASURED DENSITY</text>
+    <text x="1136" y="166" text-anchor="end" font-size="26" font-weight="700" fill="#4dd4ac">31</text>
+    <text x="1136" y="188" text-anchor="end" font-size="13" fill="#6e7d8d" letter-spacing="1">TESTS PASSING</text>
+  </g>
+</svg>

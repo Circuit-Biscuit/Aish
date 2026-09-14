@@ -1,0 +1,32 @@
+#a2 ingest worker memory growth
+aa services/ingest/src/worker/consumer.go
+ab services/ingest/src/worker/replay.go
+af buffer pool
+lk aa decoder
+why aa add decoder per msg nev del
+def decoder has buf 4mb
+did obs lk heap prof 87pct live
+val aa 200 msg s
+use ab aa
+lk ab
+why nev obs ab som replay archive
+def services/ingest/src/pool/bufferPool.go af
+use http af
+neg aa cal af
+fix aa decoder via af
+neg fix add new
+try del decoder per msg
+neg try perf 12pct
+why alloc dom
+rev try
+fix aa af add del
+req fix mod aa ab
+req fix test perf
+why aa hot
+own aa data platform team
+ask lk prod mem
+conf 3
+why aa rel 6h mos mask
+next test rel freq eq deploy size
+key "ingest_decoder_live_bytes" nev ren
+why doc alert 2 eq

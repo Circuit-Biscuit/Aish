@@ -1,0 +1,20 @@
+#a2 scheduler adoption decision
+aa new scheduler
+ab current release
+ac original author
+ref aa now
+why neq design
+why neq perf
+val ab 3 week
+val ab has 2 risky mod
+aff aa eq path mod 1
+harm ab reg nev inf cause 3
+why test bisect aa hard
+neg ac here
+val ac back mid next mon
+harm neq ac dead debug
+fix aa rel next 2
+req fix ab mod 2 obs prod week
+req fix ac test
+neg blk aa team neq
+req aa rev plan neg full deploy

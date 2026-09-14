@@ -1,0 +1,23 @@
+#a2 checkout outage 14th
+aa connection pool max
+ab checkout service
+ac deploy tool
+ad pool saturation metric
+ae load balancer
+bug val aa 5 src typ values file
+why pre val aa 50
+cha aa dep 1402 ab sat 1406 queue
+cha queue past health timeout ae del inst
+cz ae del inst traf conc
+cz traf conc sat fast
+val ab down 1411
+did rev 1431
+val ab live 1434
+val harm user 32 min
+neg ad has alert
+why obs first src user report
+neg ac rev fast
+why ac req sign man som approver busy
+next add alert ad
+next add val aa min 10
+next ac rev nev req sign env incident

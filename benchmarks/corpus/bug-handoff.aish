@@ -1,0 +1,6 @@
+#a2 login double submit
+bug submit handler dup fire
+why loc submit handler src/ui/LoginForm.tsx bind onSubmit onClick
+did obs bug chrome firefox
+neg obs bug click
+fix del onClick just onSubmit

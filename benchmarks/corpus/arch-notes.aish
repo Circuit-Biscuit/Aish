@@ -1,0 +1,27 @@
+#a2 billing module map
+ae invoicing
+ag reporting
+ah session store
+imp gateway auth
+imp gateway ledger
+imp ledger storage
+imp storage nil
+dep auth ah
+val ah redis
+dep ledger postgres
+imp ae ledger
+imp ae templates
+imp templates nil
+imp ag ledger
+imp ag ae
+own gateway platform team
+own ledger billing team
+own ae billing team
+own ag data team
+pay ledger
+los storage
+neg pay gateway auth storage templates ag
+dep ledger postgres all
+neg mod postgres
+dep auth ah som
+mod ah any

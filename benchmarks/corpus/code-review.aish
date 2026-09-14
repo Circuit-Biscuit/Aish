@@ -1,0 +1,17 @@
+#a2 pr review
+aa src/api/handlers.py
+ab src/db/queries.py
+ad page size arg
+bug neg val ad aa
+why harm los mem
+fix val ad max 100
+bug aa add sess out try
+why err cz nev del sess
+fix mov sess into try
+sec ab sql inj sort column
+why ab add sql str fmt src user
+fix val sort column white list
+bug neg cov tests/test_api.py err path
+why just test happy
+bug doc sig fetch_page ret list
+why ret gen

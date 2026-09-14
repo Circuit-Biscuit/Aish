@@ -107,14 +107,34 @@ def parse(text, dict_only=False):
     return d, claims, errs
 
 
-def check(text, shared=None):
+def check(text, shared=None, lint=True):
     d, claims, errs = parse(text)
+    local = dict(d)
     if shared:
         d = dict(shared, **d)
+    uses = collections.Counter()
     for i, pred, args in claims:
         for a in args:
-            if ID(a) and a not in d:
-                errs.append((i, "undefined id " + repr(a) + " (no dictionary entry)"))
+            if ID(a):
+                uses[a] += 1
+                if a not in d:
+                    errs.append((i, "undefined id " + repr(a) + " (no dictionary entry)"))
+    if lint:
+        # Economics are part of correctness here: an id that costs more than
+        # the literal it replaces is a pure loss, so the tool refuses it.
+        for i, raw in enumerate(text.splitlines()[1:], start=2):
+            head, _, rest = raw.strip().partition(" ")
+            if not (ID(head) and rest and head in local):
+                continue
+            P, k = ntok(rest), uses[head]
+            if k == 0:
+                errs.append((i, "waste: id " + repr(head) + " defined but never used"))
+            elif P < 2:
+                errs.append((i, "waste: id " + repr(head) + " interns a 1-token literal "
+                             + repr(rest) + "; costs 3 tokens, saves 0"))
+            elif k * P <= P + k:
+                errs.append((i, "waste: id " + repr(head) + " used %dx at %d tok; "
+                             "inline is cheaper" % (k, P)))
     return sorted(errs)
 
 
@@ -162,7 +182,8 @@ def demo():
     if EXACT:
         bad = [p for p in PRED if ntok(p) != 1]
         assert not bad, "multi-token predicates: " + str(bad)
-    doc = '#a2\naa src/auth/session.py\nbug aa loop\nkey "tok_x" mob\nconf 7\n'
+    doc = ('#a2\naa src/auth/session.py\nbug aa loop\nuse aa nil\n'
+           'key "tok_x" mob\nconf 7\n')
     assert check(doc) == [], check(doc)
     assert any("header" in m for _, m in check("nope\n"))
     assert any("unknown predicate" in m for _, m in check("#a2\nzzz aa\n"))
@@ -170,7 +191,14 @@ def demo():
     assert any("quote" in m for _, m in check('#a2\nkey "oops\n'))
     assert any("duplicate" in m for _, m in check("#a2\naa x\naa y\n"))
     d, c, _ = parse(doc)
-    assert d == {"aa": "src/auth/session.py"} and len(c) == 3
+    assert d == {"aa": "src/auth/session.py"} and len(c) == 4
+    NL = chr(10)
+    waste1 = NL.join(["#a2", "zz cat", "bug zz", ""])
+    assert any("interns a 1-token" in m for _, m in check(waste1))
+    waste2 = NL.join(["#a2", "zz src/a/b/c.py", "bug loop", ""])
+    assert any("never used" in m for _, m in check(waste2))
+    good = NL.join(["#a2", "zz src/a/b/c.py", "bug zz", "use zz nil", ""])
+    assert check(good) == [], check(good)
     hits = intern("src/auth/session.py here and src/auth/session.py again")
     assert any("src/auth/session.py" in g for _, g, _, _ in hits), hits
     assert measure("a", "a b")[2] > 0

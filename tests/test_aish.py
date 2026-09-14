@@ -194,6 +194,62 @@ def test_verbatim_strings_survive_untouched():
             assert chunk in en, p.name + ": verbatim " + repr(chunk) + " not in source"
 
 
+
+# --------------------------------------------------------------- economics ---
+
+def test_skill_file_stays_within_its_token_budget():
+    """The skill must cost less than it saves. If SKILL.md grows, the
+    break-even rises and agents that load it start losing tokens. 500 is the
+    cap; the decision rule in SKILL.md is stated against it."""
+    n = aish.ntok((ROOT / "SKILL.md").read_text(encoding="utf-8"))
+    assert n <= 500, "SKILL.md is %d tokens; over budget, break-even rises" % n
+
+
+def test_skill_threshold_is_not_optimistic():
+    """SKILL.md tells agents to use Aish above some note volume. That number
+    must be at or above the measured break-even, never below it."""
+    import re as _re
+    sk, rate, be = aish.budget(ROOT)
+    txt = (ROOT / "SKILL.md").read_text(encoding="utf-8")
+    m = _re.search(r"\*\*>(\d+) tokens\*\*", txt)
+    assert m, "SKILL.md no longer states a threshold"
+    assert int(m.group(1)) >= be, (
+        "SKILL.md claims %s tokens but break-even is %.0f" % (m.group(1), be))
+
+
+def test_budget_uses_the_measured_corpus_rate():
+    rate = aish.corpus_rate(ROOT)
+    assert rate is not None and 0.2 < rate < 0.6, rate
+    sk, r2, be = aish.budget(ROOT)
+    assert r2 == rate and abs(be - sk / rate) < 1e-6
+
+
+def test_core_predicates_in_skill_are_real():
+    """SKILL.md lists a core subset inline so agents need not load CODEBOOK.md.
+    Every one must exist, or agents emit unreadable documents."""
+    txt = (ROOT / "SKILL.md").read_text(encoding="utf-8")
+    block = txt.split("## Predicates")[1].split(chr(10), 1)[1].split("Full 77")[0]
+    words = [w for w in block.replace("|", " ").split() if w.isalpha()]
+    unknown = [w for w in words if w not in aish.PRED and w != "conf"]
+    assert not unknown, "SKILL.md lists non-existent predicates: " + str(unknown)
+
+
+def test_core_predicates_cover_most_real_usage():
+    """The inline core is only worth it if it covers most actual use."""
+    import collections as _c
+    txt = (ROOT / "SKILL.md").read_text(encoding="utf-8")
+    block = txt.split("## Predicates")[1].split(chr(10), 1)[1].split("Full 77")[0]
+    core = {w for w in block.replace("|", " ").split() if w in aish.PRED}
+    used = _c.Counter()
+    for p in _corpus():
+        for _, pred, _ in aish.parse(p.read_text(encoding="utf-8"))[1]:
+            used[pred] += 1
+    covered = sum(k for p, k in used.items() if p in core)
+    total = sum(used.values())
+    assert covered / total >= 0.85, (
+        "core covers only %.0f%% of corpus predicate uses" % (100 * covered / total))
+
+
 # ------------------------------------------------------------------ runner ---
 
 def main():

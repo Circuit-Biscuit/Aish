@@ -10,7 +10,8 @@ skill can read any other agent's documents.
 | **Density, mixed corpus** | **1.58x** (37% fewer tokens) |
 | **Density, repetitive documents + shared dictionary** | **up to 2.8x** |
 | **Corpus** | 6 document pairs, hand-written, English twin for each |
-| **Tests** | 26, all passing |
+| **Tests** | 31, all passing |
+| **Skill load cost** | 428 tokens — break-even at ~1,170 tokens of notes |
 | **Dependencies** | none (`tiktoken` optional, for exact counts) |
 
 Every number in this README is produced by `benchmarks/bench.py` at run time.
@@ -48,16 +49,76 @@ thing — no operators, no punctuation, no grammar words.
 ```bash
 git clone https://github.com/flamacore/Aish ~/.claude/skills/aish
 cd ~/.claude/skills/aish
-python tests/test_aish.py          # 26 tests
+python tests/test_aish.py          # 31 tests
 python benchmarks/bench.py         # reproduce every number below
 ```
 
 ```bash
+python tools/aish.py budget               # does this skill pay for itself?
 python tools/aish.py check examples/payments.dict examples/payments.aish
 python tools/aish.py intern notes.md      # what to put in the dictionary
 python tools/aish.py measure a.aish a.md  # real token ratio
 python tools/aish.py cost a.aish          # per-line cost, find waste
 ```
+
+---
+
+## Drop it in and agents use it on their own
+
+Clone it into the skills directory and nothing else is required. Agents pick it
+up from the skill description when they write a handoff, a session log, memory
+about to be compacted, or open a `.aish` file — and they **decide for
+themselves whether it is worth using**, because the skill leads with the
+arithmetic rather than an instruction to always encode.
+
+That decision matters more than it sounds. **A skill is not free.** Loading
+Aish costs context, so it only pays once a session writes enough notes:
+
+```
+$ python tools/aish.py budget
+SKILL.md costs      428 tok to load
+measured savings    37% of note tokens
+break-even          1167 tok of notes (~6 handoff notes)
+
+Below that, writing prose is cheaper than loading this skill.
+```
+
+The first packaging of this skill got that wrong. `SKILL.md` plus
+`CODEBOOK.md` came to **1,819 tokens**, which needs ~4,900 tokens of notes —
+roughly 25 handoff notes — before it breaks even. Most sessions never get
+there, so the skill quietly **lost** tokens for anyone who installed it.
+
+Two fixes, both measured:
+
+1. **Progressive disclosure.** Only 29 of the 77 predicates are ever used, and
+   the top 20 cover 90%. So `SKILL.md` now inlines a core subset and loads
+   `CODEBOOK.md` and `SPEC.md` only when something does not fit. 1,819 → 428.
+2. **The decision rule ships first.** `SKILL.md` opens with the threshold and
+   an explicit "write normal prose and stop reading here" branch, so an agent
+   that should not use Aish stops after ~60 tokens instead of encoding
+   something that costs more than it saves.
+
+Two tests keep this honest, because it is the kind of property that decays
+silently as documentation grows:
+
+- `test_skill_file_stays_within_its_token_budget` fails if `SKILL.md` exceeds
+  500 tokens.
+- `test_skill_threshold_is_not_optimistic` fails if the number printed in
+  `SKILL.md` drops below the measured break-even.
+
+The second one has already caught a real error: `SKILL.md` said ">1000 tokens"
+against a measured break-even of 1,167. It now says 1,500.
+
+### When agents should not use it
+
+The skill says this in its own text, so the behaviour is automatic:
+
+| situation | what the agent does |
+|---|---|
+| short session, one small note | writes prose — loading the skill would cost more |
+| commit message, PR body, code comment, docs, chat | prose, always |
+| long session, many handoffs, memory to compact | Aish |
+| reading a `.aish`/`.dict` file or a `#a2` document | Aish |
 
 ---
 
@@ -202,7 +263,7 @@ against the formula it claims to implement.
 
 ## Tests
 
-`python tests/test_aish.py` — 26 tests, no framework, no dependencies.
+`python tests/test_aish.py` — 31 tests, no framework, no dependencies.
 
 | group | what it guards |
 |---|---|
@@ -217,6 +278,9 @@ against the formula it claims to implement.
 | **corpus** | every document validates and is lint-clean |
 | | every document is denser than its English twin |
 | | **every verbatim string appears in the English source** — identifiers must survive encoding untouched |
+| **skill economics** | `SKILL.md` stays under 500 tokens, or the break-even rises and installing the skill starts costing tokens |
+| | the threshold printed in `SKILL.md` is never below the measured break-even |
+| | every predicate listed inline in `SKILL.md` actually exists, and the core covers ≥85% of real use |
 
 ---
 
@@ -265,7 +329,7 @@ responsible for the work.
 | `SPEC.md` | normative grammar, with the measurement behind each rule |
 | `CODEBOOK.md` | the 77 predicates — **generated**, do not hand-edit |
 | `tools/aish.py` | validator, economics linter, interning advisor, measurement |
-| `tests/test_aish.py` | 26 tests |
+| `tests/test_aish.py` | 31 tests |
 | `benchmarks/bench.py` | harness; regenerates `RESULTS.md` |
 | `benchmarks/corpus/` | 6 document pairs (`.md` English, `.aish` twin) |
 | `examples/payments.*` | tutorial: shared dictionary, document, English source |

@@ -8,6 +8,7 @@
 [![dependencies](https://img.shields.io/badge/dependencies-none-lightgrey?style=flat)](#install)
 [![python](https://img.shields.io/badge/python-3.8%2B-3776ab?style=flat)](#install)
 [![spec](https://img.shields.io/badge/spec-%23a2_frozen-f0883e?style=flat)](#status)
+[![license](https://img.shields.io/badge/license-MIT-green?style=flat)](LICENSE)
 
 <!--
 Dynamic badges below activate the moment this repo goes public.
@@ -349,6 +350,7 @@ responsible for the work.
 | `benchmarks/bench.py` | harness; regenerates `RESULTS.md` |
 | `benchmarks/corpus/` | 6 document pairs (`.md` English, `.aish` twin) |
 | `examples/payments.*` | tutorial: shared dictionary, document, English source |
+| `LICENSE` | MIT |
 
 ---
 
